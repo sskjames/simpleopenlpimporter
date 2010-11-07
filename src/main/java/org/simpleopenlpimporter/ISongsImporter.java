@@ -1,4 +1,4 @@
-package org.openlpimporter;
+package org.simpleopenlpimporter;
 
 import java.io.File;
 

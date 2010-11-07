@@ -1,8 +1,8 @@
-package org.openlpimporter.dao;
+package org.simpleopenlpimporter.dao;
 
 import java.util.List;
 
-import org.openlpimporter.domain.Song;
+import org.simpleopenlpimporter.domain.Song;
 
 public interface ISongImportDao
 {

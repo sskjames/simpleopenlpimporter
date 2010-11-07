@@ -1,4 +1,4 @@
-package org.openlpimporter.dao;
+package org.simpleopenlpimporter.dao;
 
 import static org.junit.Assert.*;
 
@@ -10,7 +10,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.openlpimporter.domain.Song;
+import org.simpleopenlpimporter.dao.SqliteSongImportDao;
+import org.simpleopenlpimporter.domain.Song;
 
 public class SqliteSongImportDaoTest
 {
