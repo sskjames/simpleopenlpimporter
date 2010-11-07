@@ -1,16 +1,31 @@
 package org.simpleopenlpimporter;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
-import org.simpleopenlpimporter.SongsImporter;
+import org.simpleopenlpimporter.dao.SqliteSongImportDao;
+import org.simpleopenlpimporter.domain.Song;
 
 public class SongsImporterTest
 {
 	private File file = new File("src/test/resources/songs/song1.txt");
-	private SongsImporter songsImporter = new SongsImporter();
+	private SongsImporter songsImporter = new SongsImporter() {
+		public org.simpleopenlpimporter.dao.ISongImportDao getSongImportDao()
+		{
+			return new SqliteSongImportDao() {
+				protected String getDbPath()
+				{
+					return "src/test/resources/db/songs.sqlite";
+				};
+			};
+		};
+	};
 
 	@Test
 	public void testGetXmlHeader()
@@ -35,7 +50,7 @@ public class SongsImporterTest
 		String actual = songsImporter.getCloseSongElement();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testGetOpenLyricsElement()
 	{
@@ -51,7 +66,7 @@ public class SongsImporterTest
 		String actual = songsImporter.getCloseLyricsElement();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testGetOpenVerseElement()
 	{
@@ -59,7 +74,7 @@ public class SongsImporterTest
 		String actual = songsImporter.getOpenVerseElement("Verse", 1);
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testGetCloseVerseElement()
 	{
@@ -67,7 +82,7 @@ public class SongsImporterTest
 		String actual = songsImporter.getCloseVerseElement();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testGetCData()
 	{
@@ -76,12 +91,12 @@ public class SongsImporterTest
 		String actual = songsImporter.getCData(content);
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testWrapLyricsInXml()
 	{
 		String lyrics = "Jesus loves me";
-		
+
 		String expected = songsImporter.getXmlHeader() + "\n";
 		expected += songsImporter.getOpenSongElement() + "\n";
 		expected += songsImporter.getOpenLyricsElement("en") + "\n";
@@ -89,18 +104,36 @@ public class SongsImporterTest
 		expected += songsImporter.getCData(lyrics) + "\n";
 		expected += songsImporter.getCloseVerseElement() + "\n";
 		expected += songsImporter.getCloseLyricsElement() + "\n";
-		expected += songsImporter.getCloseSongElement() + "\n";		
-		
+		expected += songsImporter.getCloseSongElement() + "\n";
+
 		System.out.println("Expected:\n" + expected);
-		
+
 		String actual = songsImporter.wrapLyricsInXml(lyrics);
 		System.out.println("Result:\n" + actual);
 		assertEquals(expected, actual);
 	}
 
-	public void testImportSongs()
+	@Test
+	public void testGetSongFromFile() throws Exception
 	{
-		fail("Not yet implemented");
+		Song song = songsImporter.getSongFromFile(file);
+		assertEquals(FilenameUtils.getBaseName(file.getName()), song.getTitle());
+		assertEquals(
+				songsImporter.wrapLyricsInXml(FileUtils.readFileToString(file)),
+				song.getLyrics());
 	}
 
+	@Test
+	public void testGetSongsInDir()
+	{
+		List<Song> songs = songsImporter.getSongsInDir(file.getParentFile());
+		assert !songs.isEmpty();
+	}
+
+	@Test
+	public void testImportSongs()
+	{
+		songsImporter.importSongs(file.getParentFile());
+		assert true;
+	}
 }

@@ -4,5 +4,5 @@ import java.io.File;
 
 public interface ISongsImporter
 {
-	void importSongsFromFlatFile(File file);
+	void importSongs(File file);
 }
