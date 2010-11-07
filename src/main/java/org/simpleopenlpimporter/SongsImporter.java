@@ -17,7 +17,6 @@ public class SongsImporter implements ISongsImporter
 {
 	private final static Logger logger = LoggerFactory
 			.getLogger(SongsImporter.class);
-	private ISongImportDao songImportDao;
 
 	public void importSongs(File file)
 	{
@@ -31,6 +30,7 @@ public class SongsImporter implements ISongsImporter
 
 		logger.info("Importing {} songs into database...", songs.size());
 		getSongImportDao().importSongs(songs);
+		logger.info("Finished importing the songs!");
 	}
 
 	protected List<Song> getSongsInDir(File dir)
@@ -126,6 +126,6 @@ public class SongsImporter implements ISongsImporter
 
 	public ISongImportDao getSongImportDao()
 	{
-		return songImportDao;
+		return new SqliteSongImportDao();
 	}
 }
